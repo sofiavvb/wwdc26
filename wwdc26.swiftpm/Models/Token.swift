@@ -11,8 +11,6 @@ import Foundation
 struct Token: Identifiable, Hashable, Codable {
     var id = UUID()
     var text: String
-    var position: CGPoint = .zero
-    var isPlaced: Bool = false
     // ver se terao 3 tipos que serao diferentes visualmente
 }
 
