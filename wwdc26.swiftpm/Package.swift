@@ -20,7 +20,7 @@ let package = Package(
             teamIdentifier: "2U7Y6S5549",
             displayVersion: "1.0",
             bundleVersion: "1",
-            appIcon: .asset("AppIcon"),
+            appIcon: .placeholder(icon: .cloud),
             accentColor: .presetColor(.teal),
             supportedDeviceFamilies: [
                 .pad,
@@ -28,7 +28,7 @@ let package = Package(
             ],
             supportedInterfaceOrientations: [
                 .landscapeRight,
-                .landscapeLeft,
+                .landscapeLeft
             ]
         )
     ],
@@ -36,10 +36,10 @@ let package = Package(
         .executableTarget(
             name: "AppModule",
             path: ".",
-//            resources: [
-//                .process("Resources")
-//            ]
+            resources: [
+                .process("Resources")
+            ]
         )
     ],
-    swiftLanguageModes: [.version("6")]
+    swiftLanguageVersions: [.version("6")]
 )

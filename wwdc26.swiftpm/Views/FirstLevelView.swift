@@ -12,26 +12,29 @@ struct FirstLevelView: View {
     @State private var vm = FirstLevelViewModel()
     @State private var navigateToNextLevel = false
     
+    
     var body: some View {
         GeometryReader { proxy in
-            ZStack {
-                Image("placeholderlv1")
-                    .resizable()
-                    .ignoresSafeArea()
+            ZStack () {
                 
-                HStack(spacing: 0){
-                    ConsoleView(
-                        geometry: proxy,
-                        progress: GameManager.shared.progress,
-                        message: GameManager.shared.consoleMessage,
-                        isAnimating: vm.showCelebration,
-                        animationFrames: GameManager.shared.level1AnimationFrames
-                    )
-                    
-                    GameArea(gameWidth:  proxy.size.width * 0.8, gameHeight: proxy.size.height, vm: vm)
-                        .coordinateSpace(name: "gameArea")
+                TimelineView(.animation(minimumInterval: 3)) { timeline in
+                    Image(vm.backgroundFrames[vm.backgroundFrame])
+                        .resizable()
+                        .ignoresSafeArea()
+                        .onChange(of: timeline.date) { _, _ in
+                            vm.updateBackgroundFrame()
+                        }
                 }
                 
+                ComponentView()
+                    .frame(width: proxy.size.width, height: proxy.size.height * 0.8)
+                    .position(
+                        x: proxy.size.width * 0.2,
+                        y: proxy.size.height * 0.05
+                    )
+                
+                FirstLevelGameArea(gameWidth:  proxy.size.width, gameHeight: proxy.size.height, vm: vm)
+                    .coordinateSpace(name: "gameArea")
             }
             .task {
                 if vm.dropZones.isEmpty {
@@ -41,35 +44,42 @@ struct FirstLevelView: View {
             .onChange(of: vm.isLevelComplete) { _, isComplete in
                 if isComplete {
                     Task {
-                        try? await Task.sleep(nanoseconds: 2_000_000_000)
+                        try? await Task.sleep(nanoseconds: 1_000_000_000)
                         navigateToNextLevel = true
                     }
                 }
             }
             .navigationDestination(isPresented: $navigateToNextLevel) {
-                WelcomeView()
+                SecondLevelView()
             }
         }
     }
 }
 
-struct GameArea: View {
+struct FirstLevelGameArea: View {
     let gameWidth: CGFloat
     let gameHeight: CGFloat
     var vm: FirstLevelViewModel
     
     var body: some View {
         ZStack {
-            // MARK: Moon
-            Circle()
-                .fill(Color.gray.opacity(0.7))
-                .frame(width: gameWidth * 0.15, height: gameHeight * 0.16)
-                .position(
-                    x: gameWidth * 0.5,
-                    y: gameHeight * 0.3
-                )
+            // MARK: -  Moon
+            TimelineView(.animation(minimumInterval: 0.8)) { timeline in
+                Image(vm.moonFrames[vm.backgroundFrame])
+                    .resizable()
+                    .ignoresSafeArea()
+                    .scaledToFit()
+                    .frame(width: gameWidth * 1.2)
+                    .position(
+                        x: gameWidth * 0.5,
+                        y: gameHeight * 0.45
+                    )
+                    .onChange(of: timeline.date) { _, _ in
+                        vm.updateBackgroundFrame()
+                    }
+            }
             
-            // MARK: Drop zones
+            // MARK: - Drop zones
             ForEach(vm.dropZones) { dropZone in
                 RoundedRectangle(cornerRadius: 20)
                     .fill(Color.gray.opacity(0.3))
@@ -77,22 +87,19 @@ struct GameArea: View {
                     .position(dropZone.position)
             }
             
-            // MARK: Tokens in drop zones
+            // MARK: - Tokens in drop zones
             ForEach(vm.dropZones) { dropZone in
                 ForEach(Array(dropZone.tokens.keys), id: \.self) { tokenId in
                     if let position = dropZone.tokens[tokenId],
                        let token = findToken(by: tokenId) {
-                        DroppedTokenView(token: token, position: position, vm: vm)
+                        DroppedTokenView(token: token, position: position, vm: vm, isLocked: vm.completedZones.contains(dropZone.id))
                     }
                 }
             }
             
             DragArea(gameWidth: gameWidth, gameHeight: gameHeight, vm: vm)
-                .frame(width: gameWidth, height: gameHeight * 0.25)
-                .position(x: gameWidth / 2, y: gameHeight * 0.92)
-            
+
         }
-        .frame(width: gameWidth, height: gameHeight)
     }
     
     private func findToken(by id: UUID) -> Token? {
@@ -106,85 +113,20 @@ struct DragArea: View {
     @Bindable var vm: LevelViewModel
     
     var body: some View {
-        Rectangle()
-            .fill(Color.white.opacity(0.1))
+        Image("dragarea")
+            .resizable()
+            .position(x: gameWidth * 0.5, y: gameHeight * 0.54)
             .overlay(
-                VStack(spacing: 15) {
+                VStack(spacing: 20) {
                     ForEach(vm.availableTokens, id: \.self) { row in
-                        HStack(spacing: 10) {
+                        HStack(spacing: 20) {
                             ForEach(row) { token in
                                 TokenView(token: token, vm: vm)
                             }
                         }
                     }
                 }
-                    .padding()
-            )
-    }
-}
-
-struct DroppedTokenView: View {
-    let token: Token
-    let position: CGPoint
-    var vm: LevelViewModel
-    
-    @State private var offset: CGSize = .zero
-    
-    var body: some View {
-        Text(token.text)
-            .padding()
-            .background(Color.white)
-            .cornerRadius(20)
-            .position(
-                x: position.x + offset.width,
-                y: position.y + offset.height
-            )
-            .gesture(
-                DragGesture(coordinateSpace: .named("gameArea"))
-                    .onChanged { value in
-                        offset = value.translation
-                    }
-                    .onEnded { value in
-                        if let _ = vm.getDropZone(at: value.location) {
-                            vm.updatePositionInDropZone(token, at: value.location)
-                        } else {
-                            vm.moveBackToDragArea(token)
-                        }
-                        
-                        withAnimation(.spring()) {
-                            offset = .zero
-                        }
-                    }
-            )
-    }
-}
-
-struct TokenView: View {
-    let token: Token
-    var vm: LevelViewModel
-    
-    @State private var offset: CGSize = .zero
-    
-    var body: some View {
-        Text(token.text)
-            .padding()
-            .background(Color.white)
-            .cornerRadius(20)
-            .offset(offset)
-            .gesture(
-                DragGesture(coordinateSpace: .named("gameArea"))
-                    .onChanged { value in
-                        offset = value.translation
-                    }
-                    .onEnded { value in
-                        if let dropZone = vm.getDropZone(at: value.location) {
-                            vm.moveToDropZone(token, dropZone: dropZone, at: value.location)
-                        }
-                        
-                        withAnimation(.spring()) {
-                            offset = .zero
-                        }
-                    }
+                .position(x: gameWidth / 2, y: gameHeight * 0.9)
             )
     }
 }

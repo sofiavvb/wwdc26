@@ -6,15 +6,36 @@
 //
 
 import SwiftUI
-import Foundation
 
 struct Token: Identifiable, Hashable, Codable {
     var id = UUID()
     var text: String
-    // ver se terao 3 tipos que serao diferentes visualmente
+    var background: String
 }
 
+//TODO: deixar isso centralizado melhor, me parece meio gambiarrento oq eu fiz
+
 @MainActor var tokensFirstLevel_: [[Token]] = [
-    [Token(text: "Does"), Token(text: "The Moon"), Token(text: "Have Phases?"), Token(text: "Why")],
-    [Token(text: "Escape?"), Token(text: "Stars?")],
+    [Token(text: "Does", background: "token-azul"),
+     Token(text: "The Moon", background: "token-verde"),
+     Token(text: "Have Phases?", background: "token-amarelo"),
+     Token(text: "Why", background: "token-azul")],
+    [Token(text: "Escape?", background: "token-amarelo"),
+     Token(text: "Stars", background: "token-verde")],
+]
+
+@MainActor var tokensSecondLevel_: [[Token]] = [
+    [Token(text: "Why", background: "token-azul"),
+     Token(text: "The Earth", background: "token-verde"),
+     Token(text: "What", background: "token-azul"),
+     Token(text: "Rotate?", background: "token-amarelo"),
+     Token(text: "Travelling?", background: "token-amarelo"),
+     Token(text: "The Rings", background: "token-verde")],
+    [Token(text: "Is", background: "token-azul"),
+     Token(text: "How", background: "token-azul"),
+     Token(text: "Made of?", background: "token-amarelo"),
+     Token(text: "Are", background: "token-azul"),
+     Token(text: "Comets", background: "token-verde"),
+     Token(text: "Does", background: "token-azul"),
+     Token(text: "Are", background: "token-azul")],
 ]

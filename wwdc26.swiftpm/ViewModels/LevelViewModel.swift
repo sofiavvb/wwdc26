@@ -7,6 +7,8 @@ import SwiftUI
     var completedZones: Set<UUID> = []
     var isLevelComplete = false
     var showCelebration = false
+    var backgroundFrame: Int = 0
+    var backgroundFrames: [String] = []
     private var allTokens: [Token] = []
     
     func setOriginalTokens(_ tokens: [[Token]]) {
@@ -53,12 +55,10 @@ import SwiftUI
         guard !completedZones.contains(dropZone.id) else { return }
         if validateDropZone(dropZone) {
             print("Valid question completed in \(dropZone.name)!")
-            
             completedZones.insert(dropZone.id)
-            
             showCelebration = true
-            
-            // TODO: Play sound
+            SoundManager.shared.playSoundEffect(named: "questionSucess")
+            GameManager.shared.currentFrame += 1
             
             if completedZones.count == dropZones.count {
                 handleLevelComplete()
@@ -118,13 +118,5 @@ import SwiftUI
         GameManager.shared.completeLevel()
         
         print("Level complete! Global progress: \(GameManager.shared.progress)")
-    }
-}
-
-extension Array {
-    func chunked(into size: Int) -> [[Element]] {
-        return stride(from: 0, to: count, by: size).map {
-            Array(self[$0 ..< Swift.min($0 + size, count)])
-        }
     }
 }
