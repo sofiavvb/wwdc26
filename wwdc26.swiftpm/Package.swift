@@ -8,13 +8,13 @@ import PackageDescription
 import AppleProductTypes
 
 let package = Package(
-    name: "wwdc26",
+    name: "Before the Answer",
     platforms: [
         .iOS("18.0")
     ],
     products: [
         .iOSApplication(
-            name: "wwdc26",
+            name: "Before the Answer",
             targets: ["AppModule"],
             bundleIdentifier: "com.sofia.wwdc26",
             teamIdentifier: "2U7Y6S5549",

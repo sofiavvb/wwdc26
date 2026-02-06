@@ -14,43 +14,45 @@ struct FirstLevelView: View {
     
     
     var body: some View {
-        GeometryReader { proxy in
-            ZStack () {
-                
-                TimelineView(.animation(minimumInterval: 3)) { timeline in
-                    Image(vm.backgroundFrames[vm.backgroundFrame])
-                        .resizable()
-                        .ignoresSafeArea()
-                        .onChange(of: timeline.date) { _, _ in
-                            vm.updateBackgroundFrame()
-                        }
+        NavigationStack {
+            GeometryReader { proxy in
+                ZStack () {
+                    
+                    TimelineView(.animation(minimumInterval: 3)) { timeline in
+                        Image(vm.backgroundFrames[vm.backgroundFrame])
+                            .resizable()
+                            .ignoresSafeArea()
+                            .onChange(of: timeline.date) { _, _ in
+                                vm.updateBackgroundFrame()
+                            }
+                    }
+                    
+                    ComponentView()
+                        .frame(width: proxy.size.width, height: proxy.size.height * 0.8)
+                        .position(
+                            x: proxy.size.width * 0.2,
+                            y: proxy.size.height * 0.05
+                        )
+                    
+                    FirstLevelGameArea(gameWidth:  proxy.size.width, gameHeight: proxy.size.height, vm: vm)
+                        .coordinateSpace(name: "gameArea")
                 }
-                
-                ComponentView()
-                    .frame(width: proxy.size.width, height: proxy.size.height * 0.8)
-                    .position(
-                        x: proxy.size.width * 0.2,
-                        y: proxy.size.height * 0.05
-                    )
-                
-                FirstLevelGameArea(gameWidth:  proxy.size.width, gameHeight: proxy.size.height, vm: vm)
-                    .coordinateSpace(name: "gameArea")
-            }
-            .task {
-                if vm.dropZones.isEmpty {
-                    vm.setupDropZones(screenSize: CGSize(width: proxy.size.width * 0.8, height: proxy.size.height))
-                }
-            }
-            .onChange(of: vm.isLevelComplete) { _, isComplete in
-                if isComplete {
-                    Task {
-                        try? await Task.sleep(nanoseconds: 1_000_000_000)
-                        navigateToNextLevel = true
+                .task {
+                    if vm.dropZones.isEmpty {
+                        vm.setupDropZones(screenSize: CGSize(width: proxy.size.width * 0.8, height: proxy.size.height))
                     }
                 }
-            }
-            .navigationDestination(isPresented: $navigateToNextLevel) {
-                SecondLevelView()
+                .onChange(of: vm.isLevelComplete) { _, isComplete in
+                    if isComplete {
+                        Task {
+                            try? await Task.sleep(nanoseconds: 1_000_000_000)
+                            navigateToNextLevel = true
+                        }
+                    }
+                }
+                .navigationDestination(isPresented: $navigateToNextLevel) {
+                    SecondLevelView()
+                }
             }
         }
     }
@@ -79,6 +81,8 @@ struct FirstLevelGameArea: View {
                     }
             }
             
+            DragArea(gameWidth: gameWidth, gameHeight: gameHeight, vm: vm)
+            
             // MARK: - Drop zones
             ForEach(vm.dropZones) { dropZone in
                 RoundedRectangle(cornerRadius: 20)
@@ -97,7 +101,6 @@ struct FirstLevelGameArea: View {
                 }
             }
             
-            DragArea(gameWidth: gameWidth, gameHeight: gameHeight, vm: vm)
 
         }
     }

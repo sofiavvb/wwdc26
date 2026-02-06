@@ -10,8 +10,8 @@ import SwiftUI
 
 struct SecondLevelView: View {
     @State private var vm = SecondLevelViewModel()
-    @State private var navigate: Bool = false
-    
+    @Environment(SceneManager.self) var sceneManager
+
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -45,15 +45,11 @@ struct SecondLevelView: View {
                 if isComplete {
                     Task {
                         try? await Task.sleep(nanoseconds: 2_000_000_000)
-                        navigate = true
+                        sceneManager.navigate(to: .endGame)
                     }
                 }
             }
             .navigationBarBackButtonHidden(true)
-            .navigationDestination(isPresented: $navigate) {
-                Text("Game Complete!")
-                    .font(Font.custom("Jersey10-Regular", size: 48))
-            }
         }
     }
 }
@@ -68,6 +64,7 @@ struct SecondLevelGameArea: View {
     
     var body: some View {
         ZStack {
+            DragArea(gameWidth: gameWidth, gameHeight: gameHeight, vm: vm)
             
             // MARK: Object Placeholders (Above drop zones)
             // Earth placeholder (Left)
@@ -124,10 +121,6 @@ struct SecondLevelGameArea: View {
                 }
             }
             
-            // MARK: Drag Area
-            DragArea(gameWidth: gameWidth, gameHeight: gameHeight, vm: vm)
-                .frame(width: gameWidth, height: gameHeight * 0.25)
-                .position(x: gameWidth / 2, y: gameHeight * 0.92)
         }
         .frame(width: gameWidth, height: gameHeight)
     }
@@ -139,5 +132,6 @@ struct SecondLevelGameArea: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .landscapeLeft) {
-    SecondLevelView()
+    var sceneManager = SceneManager()
+    SecondLevelView().environment(sceneManager)
 }

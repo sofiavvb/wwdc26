@@ -17,6 +17,7 @@ import SwiftUI
     }
     
     func getDropZone(at position: CGPoint) -> DropZone? {
+        //TODO: se a dropzone tiver locked retornar nil
         return dropZones.first { $0.contains(position) }
     }
     

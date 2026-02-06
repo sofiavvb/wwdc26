@@ -1,6 +1,5 @@
 import SwiftUI
 import CoreText
-import Foundation
 
 @main
 struct MyApp: App {
@@ -10,9 +9,7 @@ struct MyApp: App {
     
     var body: some Scene {
         WindowGroup {
-            NavigationStack{
-                FirstLevelView()
-            }
+            RootView()
         }
     }
 }
