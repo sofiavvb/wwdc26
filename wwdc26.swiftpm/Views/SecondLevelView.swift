@@ -132,6 +132,6 @@ struct SecondLevelGameArea: View {
 
 @available(iOS 17.0, *)
 #Preview(traits: .landscapeLeft) {
-    var sceneManager = SceneManager()
+    let sceneManager = SceneManager()
     SecondLevelView().environment(sceneManager)
 }

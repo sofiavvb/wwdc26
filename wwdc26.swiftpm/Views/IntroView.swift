@@ -15,6 +15,7 @@ struct IntroView: View {
             Color.black.ignoresSafeArea()
             
             VStack() {
+                Spacer()
                 Text(sceneManager.displayedText)
                     .font(Font.custom("Jersey10-Regular", size: 75))
                     .foregroundColor(.white)
