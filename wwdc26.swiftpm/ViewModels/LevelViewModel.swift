@@ -5,6 +5,7 @@ import SwiftUI
     var availableTokens: [[Token]] = []
     var dropZones: [DropZone] = []
     var completedZones: Set<UUID> = []
+    var highlightedTokenIds: Set<UUID> = []
     var isLevelComplete = false
     var showCelebration = false
     var backgroundFrame: Int = 0
@@ -109,7 +110,51 @@ import SwiftUI
         for index in dropZones.indices {
             dropZones[index].tokens.removeAll()
         }
-        availableTokens = allTokens.chunked(into: 4) //TODO: rever isso
+        availableTokens = allTokens.chunked(into: 8) //TODO: rever isso
+    }
+    
+    func hint(){
+        // escolhe random uma dropzone
+        // dessas escolhe random uma das possiveis valid questions
+        // faz brilhar por x segundos os available tokens correspondentes as palavras
+        let incompleteZones = dropZones.filter { !completedZones.contains($0.id) }
+        
+        guard !incompleteZones.isEmpty else {
+            print("no hint needed")
+            return
+        }
+        
+        guard let randomZone = incompleteZones.randomElement() else { return }
+        
+        // random valid question from that zone
+        guard let randomValidQuestion = randomZone.validQuestions.randomElement() else {
+            return
+        }
+        
+        // tokens that correspond to this valid question
+        let tokensToHighlight = randomValidQuestion.compactMap { text in
+            allTokens.first { $0.text == text }
+        }
+        
+        //TODO: ver esse flat
+        let availableTokensFlat = availableTokens.flatMap { $0 }
+        let tokensToHighlightFiltered = tokensToHighlight.filter { token in
+            availableTokensFlat.contains { $0.id == token.id }
+        }
+        
+        guard !tokensToHighlightFiltered.isEmpty else {
+            print("all tokens for this hint are already placed")
+            return
+        }
+        
+        highlightedTokenIds = Set(tokensToHighlightFiltered.map { $0.id })
+        print(highlightedTokenIds)
+        //SoundManager.shared.playSoundEffect(named: "hint")
+        
+        Task {
+            try? await Task.sleep(nanoseconds: 4_000_000_000)
+            highlightedTokenIds.removeAll()
+        }
     }
     
     private func removeFromAvailableTokens(_ token: Token) {

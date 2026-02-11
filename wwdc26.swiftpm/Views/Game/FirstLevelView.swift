@@ -28,14 +28,16 @@ struct FirstLevelView: View {
                     }
                     
                     ComponentView()
-                        .frame(width: proxy.size.width, height: proxy.size.height * 0.8)
+                        .frame(width: proxy.size.width, height: proxy.size.height * 0.75)
                         .position(
-                            x: proxy.size.width * 0.2,
+                            x: proxy.size.width * 0.18,
                             y: proxy.size.height * 0.05
                         )
                     
                     FirstLevelGameArea(gameWidth:  proxy.size.width, gameHeight: proxy.size.height, vm: vm)
                         .coordinateSpace(name: "gameArea")
+                    
+                    HologramMenu(vm: vm)
                     
                 }
                 .task {

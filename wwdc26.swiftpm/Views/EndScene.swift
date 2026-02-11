@@ -14,7 +14,7 @@ struct EndScene: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.indigo.opacity(opacity)
+                Color.purple.opacity(opacity)
                     .ignoresSafeArea()
                 
                 Text("Just like you did.")

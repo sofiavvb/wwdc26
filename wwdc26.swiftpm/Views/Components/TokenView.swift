@@ -12,7 +12,13 @@ struct TokenView: View {
     var vm: LevelViewModel
     var isLocked: Bool = false
     
+    private var isHighlighted: Bool {
+        vm.highlightedTokenIds.contains(token.id)
+    }
+    
     @State private var offset: CGSize = .zero
+    @State private var pulse: CGFloat = 1.0
+    @State private var glow: Double = 0.0
     
     var body: some View {
         Text(token.text)
@@ -22,6 +28,14 @@ struct TokenView: View {
                 Image(token.background)
                     .resizable()
             )
+            .overlay(
+                RoundedRectangle(cornerRadius: 12)
+                    .stroke(Color.white, lineWidth: 3)
+                    .opacity(glow)
+                    .blur(radius: 5)
+            )
+            .shadow(color: Color.white.opacity(glow * 0.5), radius: 15)
+            .scaleEffect(pulse)
             .offset(offset)
             .gesture(
                 DragGesture(coordinateSpace: .named("gameArea"))
@@ -38,6 +52,27 @@ struct TokenView: View {
                         }
                     }
             )
+            .onChange(of: isHighlighted) { _, highlighted in
+                if highlighted {
+                    startPulsing()
+                } else {
+                    stopPulsing()
+                }
+            }
+    }
+    
+    private func startPulsing() {
+        withAnimation(.easeInOut(duration: 0.8).repeatForever(autoreverses: true)) {
+            pulse = 1.05
+            glow = 0.7
+        }
+    }
+    
+    private func stopPulsing() {
+        withAnimation(.easeOut(duration: 0.3)) {
+            pulse = 1.0
+            glow = 0.0
+        }
     }
 }
 
@@ -63,25 +98,22 @@ struct DroppedTokenView: View {
                 y: position.y + offset.height
             )
             .gesture(isLocked ? nil :
-                DragGesture(coordinateSpace: .named("gameArea"))
-                    .onChanged { value in
-                        offset = value.translation
+                        DragGesture(coordinateSpace: .named("gameArea"))
+                .onChanged { value in
+                    offset = value.translation
+                }
+                .onEnded { value in
+                    if let zone = vm.getDropZone(at: value.location) {
+                        vm.moveToDropZone(token, dropZone: zone, at: value.location)
+                    } else {
+                        vm.moveBackToDragArea(token)
                     }
-                    .onEnded { value in
-                        if let zone = vm.getDropZone(at: value.location) {
-                            vm.moveToDropZone(token, dropZone: zone, at: value.location)
-                        } else {
-                            vm.moveBackToDragArea(token)
-                        }
-                        
-                        withAnimation(.spring()) {
-                            offset = .zero
-                        }
+                    
+                    withAnimation(.spring()) {
+                        offset = .zero
                     }
+                }
             )
     }
 }
 
-#Preview {
-    TokenView(token: Token(text: "Why", background: "token-azul"), vm: FirstLevelViewModel())
-}

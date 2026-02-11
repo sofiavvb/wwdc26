@@ -11,7 +11,7 @@ import SwiftUI
 struct SecondLevelView: View {
     @State private var vm = SecondLevelViewModel()
     @Environment(SceneManager.self) var sceneManager
-
+    
     var body: some View {
         GeometryReader { proxy in
             ZStack {
@@ -24,15 +24,16 @@ struct SecondLevelView: View {
                             vm.updateBackgroundFrame()
                         }
                 }
-                    ComponentView()
-                    .frame(width: proxy.size.width, height: proxy.size.height * 0.8)
+                ComponentView()
+                    .frame(width: proxy.size.width, height: proxy.size.height * 0.75)
                     .position(
-                        x: proxy.size.width * 0.18,
+                        x: proxy.size.width * 0.2,
                         y: proxy.size.height * 0.04
                     )
-                    
-                    SecondLevelGameArea(proxy: proxy, vm: vm).coordinateSpace(name: "gameArea")
                 
+                SecondLevelGameArea(proxy: proxy, vm: vm).coordinateSpace(name: "gameArea")
+                
+                HologramMenu(vm: vm)
                 
             }
             .task {
@@ -45,6 +46,7 @@ struct SecondLevelView: View {
                     Task {
                         try? await Task.sleep(nanoseconds: 2_000_000_000)
                         sceneManager.navigate(to: .endGame)
+                        GameManager.shared.currentFrame = 0
                     }
                 }
             }
@@ -68,10 +70,10 @@ struct SecondLevelGameArea: View {
             Image("Earth")
                 .resizable()
                 .scaledToFit()
-                .frame(width: gameWidth * 0.25, height: gameHeight * 0.24)
+                .frame(width: gameWidth * 0.22, height: gameHeight * 0.22)
                 .position(
                     x: gameWidth * 0.25,
-                    y: gameHeight * 0.34
+                    y: gameHeight * 0.45
                 )
             
             TimelineView(.animation(minimumInterval: 0.8)) { timeline in
@@ -93,10 +95,10 @@ struct SecondLevelGameArea: View {
                 .scaledToFit()
                 .frame(width: gameWidth * 0.4, height: gameHeight * 0.2)
                 .position(
-                    x: gameWidth * 0.75,
+                    x: gameWidth * 0.58,
                     y: gameHeight * 0.12
                 )
-                
+            
             
             // MARK: Drop zones
             ForEach(vm.dropZones) { dropZone in

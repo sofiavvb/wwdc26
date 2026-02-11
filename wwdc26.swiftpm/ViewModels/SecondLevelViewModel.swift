@@ -21,7 +21,7 @@ import SwiftUI
     func setupDropZones(screenSize: CGSize) {
         let earthDropZone = DropZone(
             name: "Earth",
-            position: CGPoint(x: screenSize.width * 0.245, y: screenSize.height * 0.55),
+            position: CGPoint(x: screenSize.width * 0.245, y: screenSize.height * 0.66),
             size: CGSize(width: screenSize.width * 0.4, height: screenSize.height * 0.1),
             validQuestions: [
                 ["Why", "Does", "The Earth", "Rotate?"],
@@ -36,7 +36,7 @@ import SwiftUI
         
         let cometDropZone = DropZone(
             name: "Comet",
-            position: CGPoint(x: screenSize.width * 0.76, y: screenSize.height * 0.65),
+            position: CGPoint(x: screenSize.width * 0.76, y: screenSize.height * 0.66),
             size: CGSize(width: screenSize.width * 0.4, height: screenSize.height * 0.1),
             validQuestions: [
                 ["How", "Are", "Comets", "Travelling?"],
@@ -49,7 +49,7 @@ import SwiftUI
         
         let saturnDropZone = DropZone(
             name: "Saturn",
-            position: CGPoint(x: screenSize.width * 0.75, y: screenSize.height * 0.3),
+            position: CGPoint(x: screenSize.width * 0.6, y: screenSize.height * 0.32),
             size: CGSize(width: screenSize.width * 0.4, height: screenSize.height * 0.1),
             validQuestions: [
                 ["Are", "The Rings", "Travelling?"],
