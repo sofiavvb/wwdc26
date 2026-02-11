@@ -68,8 +68,8 @@ struct DroppedTokenView: View {
                         offset = value.translation
                     }
                     .onEnded { value in
-                        if let _ = vm.getDropZone(at: value.location) {
-                            vm.updatePositionInDropZone(token, at: value.location)
+                        if let zone = vm.getDropZone(at: value.location) {
+                            vm.moveToDropZone(token, dropZone: zone, at: value.location)
                         } else {
                             vm.moveBackToDragArea(token)
                         }

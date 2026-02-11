@@ -17,7 +17,7 @@ struct FirstLevelView: View {
         NavigationStack {
             GeometryReader { proxy in
                 ZStack () {
-                    
+            
                     TimelineView(.animation(minimumInterval: 3)) { timeline in
                         Image(vm.backgroundFrames[vm.backgroundFrame])
                             .resizable()
@@ -36,16 +36,17 @@ struct FirstLevelView: View {
                     
                     FirstLevelGameArea(gameWidth:  proxy.size.width, gameHeight: proxy.size.height, vm: vm)
                         .coordinateSpace(name: "gameArea")
+                    
                 }
                 .task {
                     if vm.dropZones.isEmpty {
-                        vm.setupDropZones(screenSize: CGSize(width: proxy.size.width * 0.8, height: proxy.size.height))
+                        vm.setupDropZones(screenSize: proxy.size)
                     }
                 }
                 .onChange(of: vm.isLevelComplete) { _, isComplete in
                     if isComplete {
                         Task {
-                            try? await Task.sleep(nanoseconds: 1_000_000_000)
+                            try? await Task.sleep(nanoseconds: 0_500_000_000)
                             navigateToNextLevel = true
                         }
                     }
@@ -73,8 +74,8 @@ struct FirstLevelGameArea: View {
                     .scaledToFit()
                     .frame(width: gameWidth * 1.2)
                     .position(
-                        x: gameWidth * 0.5,
-                        y: gameHeight * 0.45
+                        x: gameWidth * 0.48,
+                        y: gameHeight * 0.48
                     )
                     .onChange(of: timeline.date) { _, _ in
                         vm.updateBackgroundFrame()
@@ -85,7 +86,7 @@ struct FirstLevelGameArea: View {
             
             // MARK: - Drop zones
             ForEach(vm.dropZones) { dropZone in
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: 15)
                     .fill(Color.gray.opacity(0.3))
                     .frame(width: dropZone.size.width, height: dropZone.size.height)
                     .position(dropZone.position)

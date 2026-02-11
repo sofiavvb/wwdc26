@@ -15,6 +15,7 @@ enum SceneType {
     case game
     case aboutMe
     case endGame
+    case endScene
 }
 
 @MainActor
@@ -24,6 +25,12 @@ enum SceneType {
     var displayedText: String = ""
     private var animationTask: Task<Void, Never>?
     var dialogCompleted: Bool = false
+    
+    private var fullText: String = ""
+    
+    var isTextComplete: Bool {
+        return displayedText == fullText && !fullText.isEmpty
+    }
     
     let dialogs: [SceneType: [String]] = [
         .intro: [
@@ -63,8 +70,13 @@ enum SceneType {
             """
         ],
         .endGame: [
-            "Depois coloco"
-        ]
+            "You did it! You created the piece that was missing!",
+            "Reflect, discover, question again.",
+            "Questions move us forward, they make us think. When knowledge from different fields comes together, innovation begins.",
+            """
+            Remember: the first step toward changing the world is staying curious and choosing to question.
+            """
+        ],
     ]
     
     func navigate(to scene: SceneType) {
@@ -76,6 +88,7 @@ enum SceneType {
     func resetDialog() {
         self.dialogIndex = 0
         self.displayedText = ""
+        self.fullText = ""
         self.dialogCompleted = false
         animationTask?.cancel()
     }
@@ -89,12 +102,12 @@ enum SceneType {
         guard !dialogCompleted else { return }
         guard let texts = dialogs[currentScene] else { return }
         
-        if displayedText != texts[dialogIndex]{
+        if displayedText != fullText {
             animationTask?.cancel()
-            displayedText = texts[dialogIndex]
+            displayedText = fullText
         } else {
             dialogIndex += 1
-            if dialogIndex < dialogs[currentScene]!.count {
+            if dialogIndex < texts.count {
                 startDialog()
             } else {
                 dialogCompleted = true
@@ -105,6 +118,7 @@ enum SceneType {
     private func animate(_ text: String){
         displayedText = ""
         animationTask?.cancel()
+        fullText = text
         
         animationTask = Task {
             for char in text {

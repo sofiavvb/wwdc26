@@ -11,7 +11,8 @@ import AVFoundation
 @MainActor
 @Observable class SoundManager {
     static let shared = SoundManager()
-    var soundEffectPlayer: AVAudioPlayer?
+    private var soundEffectPlayer: AVAudioPlayer?
+    private var musicPlayer: AVAudioPlayer?
     
     private init() {}
     
@@ -30,5 +31,29 @@ import AVFoundation
         } catch {
             print("Error playing sound effect \(soundName): \(error.localizedDescription)")
         }
+    }
+    
+    func playMusic(named musicName: String, loop: Bool = true) {
+        guard let url = Bundle.main.url(forResource: musicName, withExtension: "mp3") else {
+            return
+        }
+        
+        if musicPlayer?.url == url, musicPlayer?.isPlaying == true {
+            return
+        }
+        
+        do {
+            musicPlayer = try AVAudioPlayer(contentsOf: url)
+            musicPlayer?.numberOfLoops = loop ? -1 : 0
+            musicPlayer?.volume = 0.2
+            musicPlayer?.play()
+        } catch {
+            print("error playing music: \(error)")
+        }
+    }
+    
+    func stopMusic() {
+        musicPlayer?.stop()
+        musicPlayer = nil
     }
 }

@@ -17,12 +17,9 @@ import SwiftUI
     }
     
     func getDropZone(at position: CGPoint) -> DropZone? {
-        //TODO: se a dropzone tiver locked retornar nil
-        return dropZones.first { $0.contains(position) }
-    }
-    
-    func getDropZone(containing tokenId: UUID) -> DropZone? {
-        return dropZones.first { $0.tokens.keys.contains(tokenId) }
+        return dropZones.first { zone in
+            zone.contains(position) && !completedZones.contains(zone.id)
+        }
     }
     
     func getTokenPosition(for token: Token) -> CGPoint? {
@@ -35,27 +32,37 @@ import SwiftUI
     }
     
     func moveToDropZone(_ token: Token, dropZone: DropZone, at position: CGPoint) {
-        removeFromAvailableTokens(token)
-        
-        if let index = dropZones.firstIndex(where: { $0.id == dropZone.id }) {
-            dropZones[index].addToken(token, at: position)
-            print(dropZones[index])
-            //se eu passo so a dropZone ela nao ta certa, pois eh uma copia != da que eu acabei de adicionar o token
-            checkQuestion(for: dropZones[index])
-        }
-    }
-    
-    func updatePositionInDropZone(_ token: Token, at position: CGPoint) {
-        if let zoneIndex = dropZones.firstIndex(where: { $0.tokens.keys.contains(token.id) }) {
-            dropZones[zoneIndex].updateTokenPosition(token, at: position)
-            checkQuestion(for: dropZones[zoneIndex])
+        // if is in a dropzone already
+        if let currentZoneIndex = dropZones.firstIndex(where: { $0.tokens.keys.contains(token.id) }) {
+            // might be moving within or to another zone
+            let currentZoneId = dropZones[currentZoneIndex].id
+            
+            //same zone (update position)
+            if dropZone.id == currentZoneId {
+                dropZones[currentZoneIndex].updateTokenPosition(token, at: position)
+                checkQuestion(for: dropZones[currentZoneIndex])
+            } else {
+                guard let targetZoneIndex = dropZones.firstIndex(where: { $0.id == dropZone.id }) else { return }
+                
+                dropZones[currentZoneIndex].removeToken(token)
+                checkQuestion(for: dropZones[currentZoneIndex])
+                
+                dropZones[targetZoneIndex].addToken(token, at: position)
+                checkQuestion(for: dropZones[targetZoneIndex])
+            }
+            // from drag area
+        } else {
+            if let targetZoneIdx = dropZones.firstIndex(where: { $0.id == dropZone.id }) {
+                removeFromAvailableTokens(token)
+                dropZones[targetZoneIdx].addToken(token, at: position)
+                checkQuestion(for: dropZones[targetZoneIdx])
+            }
         }
     }
     
     func checkQuestion(for dropZone: DropZone){
         guard !completedZones.contains(dropZone.id) else { return }
         if validateDropZone(dropZone) {
-            print("Valid question completed in \(dropZone.name)!")
             completedZones.insert(dropZone.id)
             showCelebration = true
             SoundManager.shared.playSoundEffect(named: "questionSucess")
@@ -66,7 +73,7 @@ import SwiftUI
             }
             
             Task {
-                try? await Task.sleep(nanoseconds: 1_000_000_000) // 1 second
+                try? await Task.sleep(nanoseconds: 0_500_000_000)
                 showCelebration = false
             }
         }
@@ -76,6 +83,7 @@ import SwiftUI
         // TODO:  ver isso (Remove from all drop zones)
         for index in dropZones.indices {
             dropZones[index].removeToken(token)
+            checkQuestion(for: dropZones[index])
         }
         
         if availableTokens.isEmpty {
@@ -87,13 +95,13 @@ import SwiftUI
                 availableTokens[index].append(token)
             }
         }
+        
     }
     
     func validateDropZone(_ dropZone: DropZone) -> Bool {
         let orderedTokens = dropZone.getOrderedTokens(from: allTokens)
-        print("Tokens ordenados: \(orderedTokens)")
         let textArray = orderedTokens.map { $0.text }
-        print("Texto do array: \(textArray)")
+        print(textArray)
         return dropZone.validQuestions.contains(textArray)
     }
     
@@ -119,5 +127,9 @@ import SwiftUI
         GameManager.shared.completeLevel()
         
         print("Level complete! Global progress: \(GameManager.shared.progress)")
+    }
+    
+    func updateBackgroundFrame() {
+        backgroundFrame = (backgroundFrame + 1) % backgroundFrames.count
     }
 }

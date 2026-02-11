@@ -15,16 +15,20 @@ struct SecondLevelView: View {
     var body: some View {
         GeometryReader { proxy in
             ZStack {
-                Image("lv1-background1")
-                    .resizable()
-                    .ignoresSafeArea()
                 
-                
+                TimelineView(.animation(minimumInterval: 2)) { timeline in
+                    Image(vm.backgroundFrames[vm.backgroundFrame])
+                        .resizable()
+                        .ignoresSafeArea()
+                        .onChange(of: timeline.date) { _, _ in
+                            vm.updateBackgroundFrame()
+                        }
+                }
                     ComponentView()
                     .frame(width: proxy.size.width, height: proxy.size.height * 0.8)
                     .position(
-                        x: proxy.size.width * 0.2,
-                        y: proxy.size.height * 0.05
+                        x: proxy.size.width * 0.18,
+                        y: proxy.size.height * 0.04
                     )
                     
                     SecondLevelGameArea(proxy: proxy, vm: vm).coordinateSpace(name: "gameArea")
@@ -33,12 +37,7 @@ struct SecondLevelView: View {
             }
             .task {
                 if vm.dropZones.isEmpty {
-                    let gameAreaSize = CGSize(
-                        width: proxy.size.width * 0.8,
-                        height: proxy.size.height
-                    )
-                    print("Setting up Level 2 with game area size:", gameAreaSize)
-                    vm.setupDropZones(screenSize: gameAreaSize)
+                    vm.setupDropZones(screenSize: proxy.size)
                 }
             }
             .onChange(of: vm.isLevelComplete) { _, isComplete in
@@ -66,38 +65,42 @@ struct SecondLevelGameArea: View {
         ZStack {
             DragArea(gameWidth: gameWidth, gameHeight: gameHeight, vm: vm)
             
-            // MARK: Object Placeholders (Above drop zones)
-            // Earth placeholder (Left)
-            Circle()
-                .fill(Color.blue.opacity(0.7))
-                .frame(width: gameWidth * 0.12, height: gameHeight * 0.12)
+            Image("Earth")
+                .resizable()
+                .scaledToFit()
+                .frame(width: gameWidth * 0.25, height: gameHeight * 0.24)
                 .position(
                     x: gameWidth * 0.25,
-                    y: gameHeight * 0.1
+                    y: gameHeight * 0.34
                 )
             
-            // Comet placeholder (Center)
-            Circle()
-                .fill(Color.cyan.opacity(0.7))
-                .frame(width: gameWidth * 0.12, height: gameHeight * 0.12)
-                .position(
-                    x: gameWidth * 0.28,
-                    y: gameHeight * 0.5
-                )
+            TimelineView(.animation(minimumInterval: 0.8)) { timeline in
+                Image(vm.cometFrames[vm.backgroundFrame])
+                    .resizable()
+                    .scaledToFit()
+                    .frame(width: gameWidth * 0.38, height: gameHeight * 0.25)
+                    .position(
+                        x: gameWidth * 0.78,
+                        y: gameHeight * 0.5
+                    )
+                    .onChange(of: timeline.date) { _, _ in
+                        vm.updateBackgroundFrame()
+                    }
+            }
             
-            // Saturn placeholder (Right)
-            Circle()
-                .fill(Color.orange.opacity(0.7))
-                .frame(width: gameWidth * 0.12, height: gameHeight * 0.12)
+            Image("Saturn")
+                .resizable()
+                .scaledToFit()
+                .frame(width: gameWidth * 0.4, height: gameHeight * 0.2)
                 .position(
-                    x: gameWidth * 0.7,
-                    y: gameHeight * 0.3
+                    x: gameWidth * 0.75,
+                    y: gameHeight * 0.12
                 )
                 
             
             // MARK: Drop zones
             ForEach(vm.dropZones) { dropZone in
-                RoundedRectangle(cornerRadius: 20)
+                RoundedRectangle(cornerRadius: 15)
                     .fill(
                         vm.completedZones.contains(dropZone.id)
                         ? Color.green.opacity(0.3)

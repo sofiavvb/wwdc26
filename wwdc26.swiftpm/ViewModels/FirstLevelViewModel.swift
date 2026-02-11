@@ -22,8 +22,8 @@ import SwiftUI
         let moonDropZone = DropZone(
             name: "Moon",
             position: CGPoint(
-                x: screenSize.width * 0.65,
-                y: screenSize.height * 0.55
+                x: screenSize.width * 0.5,
+                y: screenSize.height * 0.58
             ),
             size: CGSize(
                 width: screenSize.width * 0.5,
@@ -38,9 +38,6 @@ import SwiftUI
         dropZones = [moonDropZone]
     }
     
-    func updateBackgroundFrame() {
-        backgroundFrame = (backgroundFrame + 1) % backgroundFrames.count
-    }
 }
 
 #Preview(traits: .landscapeLeft) {

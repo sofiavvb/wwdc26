@@ -43,9 +43,33 @@ struct ScientistView: View {
                             .scaledToFit()
                             .frame(height: geometry.size.height * 0.45)
                             .offset(x: 8)
-                                                
+                        
                         DialogBox(geometry: geometry)
                     }
+                    
+                    Button {
+                        sceneManager.skip()
+                    } label : {
+                        Image("skipbutton")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 40, height: 40)
+                            .scaleEffect(sceneManager.isTextComplete ? 1.13 : 1.0, anchor: .center)
+                            .shadow(
+                                color: sceneManager.isTextComplete ? .teal.opacity(0.5) : .clear,
+                                radius: sceneManager.isTextComplete ? 10 : 0
+                            )
+                            .animation(
+                                sceneManager.isTextComplete
+                                ? .smooth(duration: 0.8).repeatForever(autoreverses: true)
+                                : .default,
+                                value: sceneManager.isTextComplete
+                            )
+                    }
+                    .position(x: geometry.size.width * 0.9, y: geometry.size.height * 0.95)
+                    .padding(.horizontal, 60)
+                    .padding(.vertical, 45)
+
                 }
                 .onChange(of: timeline.date) {
                     backgroundFrame = (backgroundFrame + 1) % backgroundFrames.count
@@ -54,9 +78,6 @@ struct ScientistView: View {
                     sceneManager.navigate(to: .game)
                 }
                 .ignoresSafeArea(.all)
-                .onTapGesture {
-                    sceneManager.skip()
-                }
             }
         }
     }
@@ -67,16 +88,18 @@ struct DialogBox: View {
     let geometry: GeometryProxy
     
     var body: some View {
-        ZStack {
+        ZStack() {
             Image("DialogBox")
                 .resizable()
                 .scaledToFit()
             
             Text(sceneManager.displayedText)
-                .font(Font.custom("Jersey10-Regular", size: 45))
+                .font(Font.custom("Jersey10-Regular", size: 40))
                 .foregroundColor(.white)
+                .padding(.trailing, 30)
+                .padding(.vertical, 10)
                 .frame(
-                    width: geometry.size.width * 0.68,
+                    width: geometry.size.width * 0.64,
                     alignment: .topLeading
                 )
         }

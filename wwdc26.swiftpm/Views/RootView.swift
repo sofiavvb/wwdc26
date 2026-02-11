@@ -8,7 +8,7 @@
 import SwiftUI
 
 struct RootView: View {
-    var sceneManager = SceneManager()
+    let sceneManager = SceneManager()
     
     var body: some View {
         Group {
@@ -26,9 +26,29 @@ struct RootView: View {
             case .welcome:
                 WelcomeView()
             case .endGame:
-                Text("End Game").font(Font.custom("Jersey10-Regular", size: 30))
+                EndGameView()
+            case .endScene:
+                EndScene()
             }
-        }.environment(sceneManager)
+        }
+        .onChange(of: sceneManager.currentScene) { _, newScene in
+            handleMusic(for: newScene)
+        }
+        .task {
+            handleMusic(for: sceneManager.currentScene)
+        }
+        .environment(sceneManager)
+    }
+    
+    private func handleMusic(for scene: SceneType) {
+        switch scene {
+        case .intro, .welcome, .question, .scientist, .game:
+            SoundManager.shared.playMusic(named: "intro2")
+//        case .scientist, .game:
+//            SoundManager.shared.playMusic(named: "intro")
+        default:
+            SoundManager.shared.stopMusic()
+            break
+        }
     }
 }
-
