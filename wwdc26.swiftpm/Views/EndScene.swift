@@ -14,8 +14,7 @@ struct EndScene: View {
     var body: some View {
         NavigationStack {
             ZStack {
-                Color.purple.opacity(opacity)
-                    .ignoresSafeArea()
+                Color.black.ignoresSafeArea()
                 
                 Text("Just like you did.")
                     .font(Font.custom("Jersey10-Regular", size: 75))
