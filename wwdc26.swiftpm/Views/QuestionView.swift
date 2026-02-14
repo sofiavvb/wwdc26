@@ -12,11 +12,11 @@ struct QuestionView: View {
 
     var body: some View {
         ZStack {
-            Color.blue.ignoresSafeArea()
+            Color.black.ignoresSafeArea()
             
             VStack() {
                 Text(sceneManager.displayedText)
-                    .font(Font.custom("Jersey10-Regular", size: 75))
+                    .font(Font.custom(sceneManager.font, size: 75))
                     .foregroundColor(.white)
                     .frame(maxWidth: .infinity, maxHeight: 800)
                     .padding(.horizontal, 70)
@@ -30,7 +30,7 @@ struct QuestionView: View {
                         .padding()
                         .overlay {
                             Text("Skip")
-                                .font(Font.custom("Jersey10-Regular", size: 35))
+                                .font(Font.custom(sceneManager.font, size: 35))
                                 .foregroundStyle(.white)
                         }
                 }

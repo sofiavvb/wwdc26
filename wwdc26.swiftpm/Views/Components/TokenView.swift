@@ -8,6 +8,7 @@
 import SwiftUI
 
 struct TokenView: View {
+    @Environment(SceneManager.self) var sceneManager
     let token: Token
     var vm: LevelViewModel
     var isLocked: Bool = false
@@ -22,7 +23,8 @@ struct TokenView: View {
     
     var body: some View {
         Text(token.text)
-            .font(Font.custom("Jersey10-Regular", size: 24))
+            .font(Font.custom(sceneManager.font, size: 24))
+            .foregroundStyle(.black)
             .padding()
             .background(
                 Image(token.background)
@@ -77,6 +79,7 @@ struct TokenView: View {
 }
 
 struct DroppedTokenView: View {
+    @Environment(SceneManager.self) var sceneManager
     let token: Token
     let position: CGPoint
     var vm: LevelViewModel
@@ -87,7 +90,8 @@ struct DroppedTokenView: View {
     var body: some View {
         
         Text(token.text)
-            .font(Font.custom("Jersey10-Regular", size: 24))
+            .font(Font.custom(sceneManager.font, size: 24))
+            .foregroundStyle(.black)
             .padding()
             .background(
                 Image(token.background)
@@ -104,7 +108,9 @@ struct DroppedTokenView: View {
                 }
                 .onEnded { value in
                     if let zone = vm.getDropZone(at: value.location) {
-                        vm.moveToDropZone(token, dropZone: zone, at: value.location)
+                        withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                            vm.moveToDropZone(token, dropZone: zone, at: value.location)
+                        }
                     } else {
                         vm.moveBackToDragArea(token)
                     }

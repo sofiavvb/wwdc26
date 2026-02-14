@@ -61,7 +61,7 @@ struct EndGameView: View {
                             }
                             Spacer()
                             Text(sceneManager.displayedText)
-                                .font(Font.custom("Jersey10-Regular", size: 40))
+                                .font(Font.custom(sceneManager.font, size: 40))
                                 .foregroundColor(.white)
                                 
                                 .padding(.vertical, 10)

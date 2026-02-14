@@ -10,11 +10,12 @@ import SwiftUI
     var showCelebration = false
     var backgroundFrame: Int = 0
     var backgroundFrames: [String] = []
+    var isHinting: Bool = false
     private var allTokens: [Token] = []
     
     func setOriginalTokens(_ tokens: [[Token]]) {
         self.availableTokens = tokens
-        self.allTokens = tokens.flatMap { $0 }
+        self.allTokens = tokens.flatMap(\.self)
     }
     
     func getDropZone(at position: CGPoint) -> DropZone? {
@@ -35,10 +36,10 @@ import SwiftUI
     func moveToDropZone(_ token: Token, dropZone: DropZone, at position: CGPoint) {
         // if is in a dropzone already
         if let currentZoneIndex = dropZones.firstIndex(where: { $0.tokens.keys.contains(token.id) }) {
-            // might be moving within or to another zone
+            
             let currentZoneId = dropZones[currentZoneIndex].id
             
-            //same zone (update position)
+            // same zone
             if dropZone.id == currentZoneId {
                 dropZones[currentZoneIndex].updateTokenPosition(token, at: position)
                 checkQuestion(for: dropZones[currentZoneIndex])
@@ -74,14 +75,13 @@ import SwiftUI
             }
             
             Task {
-                try? await Task.sleep(nanoseconds: 0_500_000_000)
+                try? await Task.sleep(nanoseconds: 1_000_000_000)
                 showCelebration = false
             }
         }
     }
     
     func moveBackToDragArea(_ token: Token) {
-        // TODO:  ver isso (Remove from all drop zones)
         for index in dropZones.indices {
             dropZones[index].removeToken(token)
             checkQuestion(for: dropZones[index])
@@ -102,60 +102,167 @@ import SwiftUI
     func validateDropZone(_ dropZone: DropZone) -> Bool {
         let orderedTokens = dropZone.getOrderedTokens(from: allTokens)
         let textArray = orderedTokens.map { $0.text }
-        print(textArray)
         return dropZone.validQuestions.contains(textArray)
     }
     
     func reset() {
+        var tokensToAdd: [Token] = []
+        var tokensReseted: [Token] = availableTokens.flatMap(\.self)
+        
         for index in dropZones.indices {
+            // cant reset tokens already locked
+            if completedZones.contains(dropZones[index].id) { continue }
+            
+            tokensToAdd = allTokens.filter {
+                dropZones[index].tokens.keys.contains($0.id)
+            }
+            
+            for token in tokensToAdd {
+                tokensReseted.append(token)
+            }
             dropZones[index].tokens.removeAll()
         }
-        availableTokens = allTokens.chunked(into: 8) //TODO: rever isso
+        availableTokens = tokensReseted.chunked(into: 6)
     }
     
-    func hint(){
-        // escolhe random uma dropzone
-        // dessas escolhe random uma das possiveis valid questions
-        // faz brilhar por x segundos os available tokens correspondentes as palavras
+    func hint() {
         let incompleteZones = dropZones.filter { !completedZones.contains($0.id) }
+        var chosenZone: DropZone? = nil
+        var questionsToChoose: [[String]] = []
+        
+        isHinting.toggle()
         
         guard !incompleteZones.isEmpty else {
-            print("no hint needed")
+            print("todas as zonas preenchidas")
+            return
+        }
+    
+        // transform them in a single list
+        let availableTokensConcatened = availableTokens.flatMap(\.self)
+        var availableTokensIds = Set(availableTokensConcatened.map(\.id))
+        
+        // add the id's of tokens in incompleted zones (not in drag area)
+        for incompleteZone in incompleteZones {
+            for tokenId in incompleteZone.tokens.keys {
+                availableTokensIds.insert(tokenId)
+            }
+        }
+        
+        // choose zone (the one with less tokens, maybe i will change)
+        chooseZone(incompleteZones, availableTokensIds, &chosenZone, &questionsToChoose)
+        
+        guard let zone = chosenZone else {
+            print("nao tem solvable zone")
             return
         }
         
-        guard let randomZone = incompleteZones.randomElement() else { return }
-        
-        // random valid question from that zone
-        guard let randomValidQuestion = randomZone.validQuestions.randomElement() else {
+        // choose question considerating the tokens the user already placed
+        guard let selectedQuestion = chooseQuestion(from: questionsToChoose, in: zone, availableTokenIds: availableTokensIds) else {
+            print("tem nao")
             return
         }
         
-        // tokens that correspond to this valid question
-        let tokensToHighlight = randomValidQuestion.compactMap { text in
-            allTokens.first { $0.text == text }
+        print("Pergunta escolhida: \(selectedQuestion)")
+        var tokenIdsToMove: [UUID] = []
+        
+        for word in selectedQuestion {
+            if let token = allTokens.first(where: {
+                $0.text == word &&
+                availableTokensIds.contains($0.id)
+            }) {
+                tokenIdsToMove.append(token.id)
+            }
         }
         
-        //TODO: ver esse flat
-        let availableTokensFlat = availableTokens.flatMap { $0 }
-        let tokensToHighlightFiltered = tokensToHighlight.filter { token in
-            availableTokensFlat.contains { $0.id == token.id }
-        }
+        solve(zone: zone, tokenIds: tokenIdsToMove)
         
-        guard !tokensToHighlightFiltered.isEmpty else {
-            print("all tokens for this hint are already placed")
-            return
-        }
-        
-        highlightedTokenIds = Set(tokensToHighlightFiltered.map { $0.id })
-        print(highlightedTokenIds)
-        //SoundManager.shared.playSoundEffect(named: "hint")
-        
-        Task {
-            try? await Task.sleep(nanoseconds: 4_000_000_000)
-            highlightedTokenIds.removeAll()
+    }
+    
+    private func chooseZone(_ incompleteZones: [DropZone], _ availableTokensIds: Set<UUID>, _ chosenZone: inout DropZone?, _ questionsToChoose: inout [[String]]) {
+
+        for zone in incompleteZones {
+            let availableQuestions = zone.validQuestions.filter { question in
+                question.allSatisfy { word in
+                    allTokens.contains { token in
+                        token.text == word &&
+                        availableTokensIds.contains(token.id)
+                    }
+                }
+            }
+            
+            if availableQuestions.isEmpty {
+                continue
+            }
+            
+            if chosenZone == nil {
+                chosenZone = zone
+                questionsToChoose = availableQuestions
+            }else if (zone.tokens.keys.count < chosenZone!.tokens.keys.count){
+                chosenZone = zone
+                questionsToChoose = availableQuestions
+            }
         }
     }
+    
+    private func chooseQuestion(from questions: [[String]], in zone: DropZone, availableTokenIds: Set<UUID>) -> [String]? {
+        var bestQuestion: [String]? = nil
+        var bestScore = -1
+        let placedWords = zone.tokens.keys.compactMap { id in
+            allTokens.first(where: { $0.id == id })?.text
+        }
+        
+        for question in questions {
+            
+            let score = question.filter { word in
+                placedWords.contains(word)
+            }.count
+            
+            if score > bestScore {
+                bestScore = score
+                bestQuestion = question
+            }
+        }
+        
+        return bestQuestion
+    }
+    
+    private func solve(zone: DropZone, tokenIds: [UUID]) {
+        Task {
+            guard let zoneIndex = dropZones.firstIndex(where: { $0.id == zone.id }) else { return }
+
+            let tokenIdsSet = Set(tokenIds)
+            let tokensAlreadyInZone = Set(dropZones[zoneIndex].tokens.keys)
+
+            for tokenId in tokensAlreadyInZone where !tokenIdsSet.contains(tokenId) {
+                if let token = allTokens.first(where: { $0.id == tokenId }) {
+                    withAnimation(.easeInOut(duration: 0.25)) {
+                        moveBackToDragArea(token)
+                    }
+                    try? await Task.sleep(nanoseconds: 150_000_000)
+                }
+            }
+
+            let spacing: CGFloat = 100
+            let startX = zone.position.x - zone.frame.width / 2
+
+            for (index, tokenId) in tokenIds.enumerated() {
+                guard let token = allTokens.first(where: { $0.id == tokenId }) else { continue }
+
+                let position = CGPoint(
+                    x: startX + CGFloat(index) * spacing,
+                    y: zone.position.y
+                )
+
+                withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
+                    moveToDropZone(token, dropZone: zone, at: position)
+                }
+
+                try? await Task.sleep(nanoseconds: 450_000_000)
+            }
+            isHinting.toggle()
+        }
+    }
+
     
     private func removeFromAvailableTokens(_ token: Token) {
         for (rowIndex, row) in availableTokens.enumerated() {
@@ -168,10 +275,7 @@ import SwiftUI
     
     private func handleLevelComplete() {
         isLevelComplete = true
-        
         GameManager.shared.completeLevel()
-        
-        print("Level complete! Global progress: \(GameManager.shared.progress)")
     }
     
     func updateBackgroundFrame() {

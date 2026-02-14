@@ -10,8 +10,8 @@ import SwiftUI
 struct DropZone: Identifiable {
     let id: UUID = UUID()
     let name: String
-    let position: CGPoint //center position on screen
-    let size: CGSize //width and height of the drop zone
+    let position: CGPoint
+    let size: CGSize 
     let validQuestions: [[String]]
     var tokens: [UUID: CGPoint] = [:]  //tokenId -> position in this zone
     let minTokenSpacing: CGFloat = 50
@@ -51,7 +51,7 @@ struct DropZone: Identifiable {
                 if distance < minTokenSpacing {
                     hasCollision = true
                     // move right on the first colision found
-                    xCoordinate = otherPosition.x + minTokenSpacing + 90
+                    xCoordinate = otherPosition.x + minTokenSpacing + 60
                     break
                 }
             }

@@ -71,6 +71,9 @@ struct ScientistView: View {
                     .padding(.vertical, 45)
 
                 }
+                .onTapGesture {
+                    sceneManager.skip()
+                }
                 .onChange(of: timeline.date) {
                     backgroundFrame = (backgroundFrame + 1) % backgroundFrames.count
                 }
@@ -94,7 +97,7 @@ struct DialogBox: View {
                 .scaledToFit()
             
             Text(sceneManager.displayedText)
-                .font(Font.custom("Jersey10-Regular", size: 40))
+                .font(Font.custom(sceneManager.font, size: 40))
                 .foregroundColor(.white)
                 .padding(.trailing, 30)
                 .padding(.vertical, 10)

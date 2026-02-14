@@ -17,7 +17,7 @@ struct EndScene: View {
                 Color.black.ignoresSafeArea()
                 
                 Text("Just like you did.")
-                    .font(Font.custom("Jersey10-Regular", size: 75))
+                    .font(Font.custom(sceneManager.font, size: 75))
                     .foregroundColor(.white)
                     .opacity(opacity)
                     .frame(maxWidth: .infinity, maxHeight: 800)

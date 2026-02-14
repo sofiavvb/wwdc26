@@ -23,7 +23,7 @@ struct WelcomeView: View {
                     .padding()
                     .overlay {
                         Text("Play")
-                            .font(Font.custom("Jersey10-Regular", size: 35))
+                            .font(Font.custom(sceneManager.font, size: 35))
                             .foregroundStyle(.black)
                     }
             }

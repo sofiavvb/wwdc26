@@ -9,33 +9,38 @@ import SwiftUI
 
 struct IntroView: View {
     @Environment(SceneManager.self) var sceneManager
-
+    
     var body: some View {
         ZStack {
             Color.black.ignoresSafeArea()
             
-            VStack() {
-                Spacer()
-                Text(sceneManager.displayedText)
-                    .font(Font.custom("Jersey10-Regular", size: 75))
-                    .foregroundColor(.white)
-                    .frame(maxWidth: .infinity, maxHeight: 800)
-                    .padding(.horizontal, 70)
-                
-                Button {
-                    sceneManager.skip()
-                } label : {
-                    RoundedRectangle(cornerRadius: 20)
-                        .frame(width: 200, height: 50)
-                        .font(.title)
-                        .padding()
-                        .overlay {
-                            Text("Skip")
-                                .font(Font.custom("Jersey10-Regular", size: 35))
-                                .foregroundStyle(.white)
-                        }
+            GeometryReader { geometry in
+                VStack() {
+                    Spacer()
+                    Text(sceneManager.displayedText)
+                        .font(Font.custom(sceneManager.font, size: 75))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity, maxHeight: 800, alignment: .leading)
+                        .padding(.horizontal, 70)
+                        .offset(x: geometry.size.width / 8)
+
+                    
+                    Button {
+                        sceneManager.skip()
+                    } label : {
+                        RoundedRectangle(cornerRadius: 20)
+                            .frame(width: 200, height: 50)
+                            .font(.title)
+                            .padding()
+                            .overlay {
+                                Text("Skip")
+                                    .font(Font.custom(sceneManager.font, size: 35))
+                                    .foregroundStyle(.white)
+                            }
+                    }
                 }
             }
+           
             
         }.task{
             sceneManager.startDialog()

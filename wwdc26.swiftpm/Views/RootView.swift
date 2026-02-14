@@ -40,12 +40,10 @@ struct RootView: View {
         .environment(sceneManager)
     }
     
-    private func handleMusic(for scene: SceneType) {
+    func handleMusic(for scene: SceneType) {
         switch scene {
         case .intro, .welcome, .question, .scientist, .game:
             SoundManager.shared.playMusic(named: "intro2")
-//        case .scientist, .game:
-//            SoundManager.shared.playMusic(named: "intro")
         default:
             SoundManager.shared.stopMusic()
             break

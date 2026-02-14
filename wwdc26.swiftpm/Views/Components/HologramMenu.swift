@@ -8,7 +8,8 @@
 import SwiftUI
 
 struct HologramMenu: View {
-    @State private var isExpanded = false
+    @Environment(SceneManager.self) var sceneManager
+    @State private var isExpanded = true
     @Bindable var vm: LevelViewModel
     
     var body: some View {
@@ -37,22 +38,28 @@ struct HologramMenu: View {
                     
                     if isExpanded {
                         VStack(spacing: 20) {
-                            Button {
+                            Button() {
                                 vm.hint()
                             } label: {
-                                Image("hintButton")
+                                Image("ButtonGame")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 100, height: 50)
-                            }
+                                    .overlay {
+                                        buttonText(text: "SOLVE", font: sceneManager.font, acessibilityLabel: "Solve one dropzone")
+                                    }
+                            }.disabled(vm.isHinting)
                             
                             Button {
                                 vm.reset()
                             } label: {
-                                Image("resetButton")
+                                Image("ButtonGame")
                                     .resizable()
                                     .scaledToFit()
                                     .frame(width: 100, height: 50)
+                                    .overlay{
+                                        buttonText(text: "RESET", font: sceneManager.font, acessibilityLabel: "Reset available tokens to drag area.")
+                                    }
                             }
                         }
                         .padding(.trailing, 15)
@@ -63,3 +70,18 @@ struct HologramMenu: View {
         }
     }
 }
+
+struct buttonText: View {
+    var text: String
+    var font: String
+    var acessibilityLabel: String
+    
+    var body: some View {
+        Text(text)
+            .font(Font.custom(font, size: 32))
+            .bold()
+            .accessibilityLabel(acessibilityLabel)
+            .foregroundStyle(Color.black)
+    }
+}
+

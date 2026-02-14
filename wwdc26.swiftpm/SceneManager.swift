@@ -23,6 +23,7 @@ enum SceneType {
     var currentScene: SceneType = .welcome
     var dialogIndex: Int = 0
     var displayedText: String = ""
+    var font: String = "Jersey10-Regular"
     private var animationTask: Task<Void, Never>?
     var dialogCompleted: Bool = false
     
@@ -113,6 +114,10 @@ enum SceneType {
                 dialogCompleted = true
             }
         }
+    }
+    
+    func changeFont(to fontName: String){
+        self.font = fontName
     }
     
     private func animate(_ text: String){
