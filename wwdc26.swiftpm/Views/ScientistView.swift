@@ -49,6 +49,7 @@ struct ScientistView: View {
                     
                     Button {
                         sceneManager.skip()
+                        SoundManager.shared.playSoundEffect(named: "buttonSound")
                     } label : {
                         Image("skipbutton")
                             .resizable()

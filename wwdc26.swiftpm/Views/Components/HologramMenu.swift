@@ -40,6 +40,7 @@ struct HologramMenu: View {
                         VStack(spacing: 20) {
                             Button() {
                                 vm.hint()
+                                SoundManager.shared.playSoundEffect(named: "buttonSound")
                             } label: {
                                 Image("ButtonGame")
                                     .resizable()
@@ -52,6 +53,7 @@ struct HologramMenu: View {
                             
                             Button {
                                 vm.reset()
+                                SoundManager.shared.playSoundEffect(named: "buttonSound")
                             } label: {
                                 Image("ButtonGame")
                                     .resizable()
@@ -81,7 +83,7 @@ struct buttonText: View {
             .font(Font.custom(font, size: 32))
             .bold()
             .accessibilityLabel(acessibilityLabel)
-            .foregroundStyle(Color.black)
+            .foregroundStyle(Color(hex: "#0D201F"))
     }
 }
 

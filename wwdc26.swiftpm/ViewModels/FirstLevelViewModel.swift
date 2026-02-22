@@ -10,6 +10,7 @@ import SwiftUI
 @MainActor
 @Observable class FirstLevelViewModel: LevelViewModel {
     let moonFrames = ["moon1", "moon2", "moon3", "moon4", "moon5", "moon6"]
+    var isShowingSheet: Bool = true
     
     override init() {
         super.init()
@@ -31,7 +32,8 @@ import SwiftUI
             ),
             validQuestions: [
                 ["Why", "Does", "The Moon", "Have Phases?"],
-                ["Does", "The Moon", "Have Phases?"]
+                ["Does", "The Moon", "Have Phases?"],
+                ["Does", "The Moon", "Escape?"]
             ]
         )
         

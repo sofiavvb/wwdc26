@@ -13,7 +13,6 @@ enum SceneType {
     case question
     case scientist
     case game
-    case aboutMe
     case endGame
     case endScene
 }
@@ -36,20 +35,18 @@ enum SceneType {
     let dialogs: [SceneType: [String]] = [
         .intro: [
             """
-            “The important thing is not to stop\nquestioning. Curiosity has its own\nreason for existence.”
+            “The important thing is not to stop questioning. Curiosity has its own reason for existence.”
             
             - Albert Einstein
             """,
             "Where can our curiosity takes us?",
-            "Since humankind exists, we try to\nunveil the mysteries of reality, of the\nvery universe that surround us.",
-            "It is through science that we venture\ntoward the boundaries of what we\nknow. From the wonders of the\nuniverse to our own cells.",
-            "At the core of science there is one\nthing: questions."
-        ],
-        .question: [
+            "Since humankind exists, we try to unveil the mysteries of reality, of the very universe that surround us.",
+            "It is through science that we venture toward the boundaries of what we know. From the wonders of the universe to our own cells.",
+            "At the core of science there is one thing: questions.",
             """
             But think about it...
             
-            What is the point of an answer if we\ndon’t know the right questions to ask?
+            What is the point of an answer if we don’t know the right questions to ask?
             """
         ],
         .scientist: [

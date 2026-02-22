@@ -21,8 +21,6 @@ struct RootView: View {
                 ScientistView()
             case .game:
                 FirstLevelView()
-            case .aboutMe:
-                EmptyView()
             case .welcome:
                 WelcomeView()
             case .endGame:
@@ -42,8 +40,11 @@ struct RootView: View {
     
     func handleMusic(for scene: SceneType) {
         switch scene {
-        case .intro, .welcome, .question, .scientist, .game:
+        case .intro, .welcome, .question, .game, .endGame, .endScene:
             SoundManager.shared.playMusic(named: "intro2")
+        case .scientist:
+            SoundManager.shared.playMusic(named: "intro2")
+            //SoundManager.shared.playSoundEffect(named: "ship")
         default:
             SoundManager.shared.stopMusic()
             break

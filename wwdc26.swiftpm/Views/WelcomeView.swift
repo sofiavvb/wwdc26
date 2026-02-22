@@ -11,37 +11,27 @@ struct WelcomeView: View {
     @Environment(SceneManager.self) var sceneManager
 
     var body: some View {
-        VStack {
-            Text("Before the Answer").font(Font.custom("Jersey10-Regular", size: 85))
+        ZStack{
+            Image("welcome")
+                .resizable()
+                .scaledToFill()
             
             Button {
                 sceneManager.currentScene = .intro
+                SoundManager.shared.playSoundEffect(named: "buttonSound")
             } label : {
-                RoundedRectangle(cornerRadius: 20)
-                    .frame(width: 200, height: 50)
-                    .font(.title)
-                    .padding()
-                    .overlay {
-                        Text("Play")
-                            .font(Font.custom(sceneManager.font, size: 35))
-                            .foregroundStyle(.black)
+                Image("startbutton")
+                    .resizable()
+                    .scaledToFit()
+                    .overlay{
+                        Text("START")
+                            .font(Font.custom(sceneManager.font, size: 30))
+                            .foregroundStyle(Color(hex: "#0D201F"))
                     }
+                    .frame(width: 200, height: 150)
             }
-            
-//            Button {
-//                sceneManager.currentScene = .aboutMe
-//            } label : {
-//                RoundedRectangle(cornerRadius: 20)
-//                    .frame(width: 200, height: 50)
-//                    .font(.title)
-//                    .padding()
-//                    .overlay {
-//                        Text("About Me")
-//                            .font(Font.custom("Jersey10-Regular", size: 35))
-//                            .foregroundStyle(.black)
-//                    }
-//            }
-        }
+        }                .ignoresSafeArea(edges: .all)
+
     }
 }
 

@@ -110,6 +110,16 @@ struct SecondLevelGameArea: View {
                     )
                     .frame(width: dropZone.size.width, height: dropZone.size.height)
                     .position(dropZone.position)
+                    .onTapGesture { location in
+                        if let token = vm.selectedToken {
+//                            vm.moveToDropZone(token, dropZone: dropZone, at: CGPoint(x: dropZone.frame.minX, y: dropZone.baseline))
+                            vm.moveToDropZone(token, dropZone: dropZone, at: location)
+                            vm.selectedToken = nil
+                        }
+                    }
+                    .accessibilityLabel("Drop zone \(dropZone.name)")
+                    .accessibilityHint("Place a word token here")
+                    .accessibilityDropPoint(.center, description: "You can drop here")
             }
             
             // MARK: Tokens in drop zones

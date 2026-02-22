@@ -23,6 +23,7 @@ struct QuestionView: View {
                 
                 Button {
                     sceneManager.skip()
+                    SoundManager.shared.playSoundEffect(named: "buttonSound")
                 } label : {
                     RoundedRectangle(cornerRadius: 20)
                         .frame(width: 200, height: 50)

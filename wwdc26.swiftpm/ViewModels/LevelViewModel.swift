@@ -5,12 +5,14 @@ import SwiftUI
     var availableTokens: [[Token]] = []
     var dropZones: [DropZone] = []
     var completedZones: Set<UUID> = []
-    var highlightedTokenIds: Set<UUID> = []
     var isLevelComplete = false
     var showCelebration = false
     var backgroundFrame: Int = 0
     var backgroundFrames: [String] = []
     var isHinting: Bool = false
+    var isDragging: Bool = false
+    var selectedToken: Token? = nil
+    var incorrectTokensIds: Set<UUID> = []
     private var allTokens: [Token] = []
     
     func setOriginalTokens(_ tokens: [[Token]]) {
@@ -34,6 +36,17 @@ import SwiftUI
     }
     
     func moveToDropZone(_ token: Token, dropZone: DropZone, at position: CGPoint) {
+//        if !checkCompatibility(token, with: dropZone) {
+//            incorrectTokensIds.insert(token.id)
+//            SoundManager.shared.playSoundEffect(named: "error")
+//            
+//            Task {
+//                    try? await Task.sleep(nanoseconds: 600_000_000)
+//                    incorrectTokensIds.remove(token.id)
+//                    moveBackToDragArea(token)
+//            }
+//        }
+        
         // if is in a dropzone already
         if let currentZoneIndex = dropZones.firstIndex(where: { $0.tokens.keys.contains(token.id) }) {
             
@@ -122,7 +135,7 @@ import SwiftUI
             }
             dropZones[index].tokens.removeAll()
         }
-        availableTokens = tokensReseted.chunked(into: 6)
+        availableTokens = tokensReseted.chunked(into: 7)
     }
     
     func hint() {
@@ -136,7 +149,7 @@ import SwiftUI
             print("todas as zonas preenchidas")
             return
         }
-    
+        
         // transform them in a single list
         let availableTokensConcatened = availableTokens.flatMap(\.self)
         var availableTokensIds = Set(availableTokensConcatened.map(\.id))
@@ -179,7 +192,7 @@ import SwiftUI
     }
     
     private func chooseZone(_ incompleteZones: [DropZone], _ availableTokensIds: Set<UUID>, _ chosenZone: inout DropZone?, _ questionsToChoose: inout [[String]]) {
-
+        
         for zone in incompleteZones {
             let availableQuestions = zone.validQuestions.filter { question in
                 question.allSatisfy { word in
@@ -229,11 +242,11 @@ import SwiftUI
     private func solve(zone: DropZone, tokenIds: [UUID]) {
         Task {
             guard let zoneIndex = dropZones.firstIndex(where: { $0.id == zone.id }) else { return }
-
-            let tokenIdsSet = Set(tokenIds)
-            let tokensAlreadyInZone = Set(dropZones[zoneIndex].tokens.keys)
-
-            for tokenId in tokensAlreadyInZone where !tokenIdsSet.contains(tokenId) {
+            
+            let tokensInZone = Set(dropZones[zoneIndex].tokens.keys)
+            
+            // clean the zone
+            for tokenId in tokensInZone {
                 if let token = allTokens.first(where: { $0.id == tokenId }) {
                     withAnimation(.easeInOut(duration: 0.25)) {
                         moveBackToDragArea(token)
@@ -241,28 +254,35 @@ import SwiftUI
                     try? await Task.sleep(nanoseconds: 150_000_000)
                 }
             }
-
-            let spacing: CGFloat = 100
+            
             let startX = zone.position.x - zone.frame.width / 2
-
-            for (index, tokenId) in tokenIds.enumerated() {
+            var currentX = startX
+            
+            for (_, tokenId) in tokenIds.enumerated() {
                 guard let token = allTokens.first(where: { $0.id == tokenId }) else { continue }
-
+                
                 let position = CGPoint(
-                    x: startX + CGFloat(index) * spacing,
-                    y: zone.position.y
+                    x: currentX + token.getTokenWidth() / 2,
+                    y: zone.baseline
                 )
-
+                
                 withAnimation(.spring(response: 0.35, dampingFraction: 0.7)) {
                     moveToDropZone(token, dropZone: zone, at: position)
                 }
+                
+                currentX += token.getTokenWidth() + 12
 
-                try? await Task.sleep(nanoseconds: 450_000_000)
+                try? await Task.sleep(nanoseconds: 400_000_000)
             }
             isHinting.toggle()
         }
     }
-
+    
+    func checkCompatibility(_ token: Token, with dropZone: DropZone) -> Bool {
+        return dropZone.validQuestions.contains { question in
+            question.contains(token.text)
+        }
+    }
     
     private func removeFromAvailableTokens(_ token: Token) {
         for (rowIndex, row) in availableTokens.enumerated() {

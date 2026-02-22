@@ -11,6 +11,32 @@ struct Token: Identifiable, Hashable, Codable {
     var id = UUID()
     var text: String
     var background: String
+    
+    var color: Color {
+        switch background {
+        case "token-amarelo":
+            return .yellow
+        case "token-azul":
+            return .blue
+        case "token-verde":
+            return .green
+        default:
+            return .teal
+        }
+    }
+    
+    func getTokenWidth() -> CGFloat {
+        switch background {
+        case "token-amarelo":
+            return 90
+        case "token-azul":
+            return 60
+        case "token-verde":
+            return 90
+        default:
+            return 100
+        }
+    }
 }
 
 //TODO: deixar isso centralizado melhor, me parece meio gambiarrento oq eu fiz

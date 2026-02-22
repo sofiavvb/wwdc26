@@ -14,7 +14,7 @@ struct DropZone: Identifiable {
     let size: CGSize 
     let validQuestions: [[String]]
     var tokens: [UUID: CGPoint] = [:]  //tokenId -> position in this zone
-    let minTokenSpacing: CGFloat = 50
+    let minTokenSpacing: CGFloat = 65
     
     var frame: CGRect {
         CGRect(
@@ -37,21 +37,21 @@ struct DropZone: Identifiable {
     mutating func findValidPosition(tokenId: UUID, at droppedPosition: CGPoint) -> CGPoint {
         var xCoordinate = droppedPosition.x
         var attempts = 0
-        let maxAttempts = 10
         
         // get all other tokens of the dropzone
         let otherTokens = tokens.filter { $0.key != tokenId }
         
-        while attempts < maxAttempts {
+        while attempts < 10 {
             var hasCollision = false
             
-            for (_, otherPosition) in otherTokens {
-                let distance = abs(xCoordinate - otherPosition.x)
+            for (_, position) in otherTokens {
+                let distance = abs(xCoordinate - position.x)
+                
                 print(distance)
                 if distance < minTokenSpacing {
+                    print("colidiu")
                     hasCollision = true
-                    // move right on the first colision found
-                    xCoordinate = otherPosition.x + minTokenSpacing + 60
+                    xCoordinate = position.x + minTokenSpacing + 60
                     break
                 }
             }

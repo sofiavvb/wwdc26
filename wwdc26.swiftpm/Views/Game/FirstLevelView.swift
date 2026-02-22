@@ -17,7 +17,7 @@ struct FirstLevelView: View {
         NavigationStack {
             GeometryReader { proxy in
                 ZStack () {
-            
+                    
                     TimelineView(.animation(minimumInterval: 3)) { timeline in
                         Image(vm.backgroundFrames[vm.backgroundFrame])
                             .resizable()
@@ -26,7 +26,6 @@ struct FirstLevelView: View {
                                 vm.updateBackgroundFrame()
                             }
                     }
-                    
                     ComponentView()
                         .frame(width: proxy.size.width, height: proxy.size.height * 0.75)
                         .position(
@@ -38,6 +37,11 @@ struct FirstLevelView: View {
                         .coordinateSpace(name: "gameArea")
                     
                     HologramMenu(vm: vm)
+                    
+                    if vm.isShowingSheet {
+                        InfoSheet(vm: vm, proxy: proxy)
+                    }
+                    
                     
                 }
                 .task {
@@ -92,6 +96,15 @@ struct FirstLevelGameArea: View {
                     .fill(Color.gray.opacity(0.3))
                     .frame(width: dropZone.size.width, height: dropZone.size.height)
                     .position(dropZone.position)
+                    .onTapGesture { location in
+                        if let token = vm.selectedToken {
+                            vm.moveToDropZone(token, dropZone: dropZone, at: location)
+                            vm.selectedToken = nil
+                        }
+                    }
+                    .accessibilityLabel("Drop zone \(dropZone.name)")
+                    .accessibilityHint("Place a word token here ")
+                    .accessibilityDropPoint(.center, description: "You can drop here")
             }
             
             // MARK: - Tokens in drop zones
@@ -104,7 +117,7 @@ struct FirstLevelGameArea: View {
                 }
             }
             
-
+            
         }
     }
     
@@ -134,10 +147,14 @@ struct DragArea: View {
                 }
                 .position(x: gameWidth / 2, y: gameHeight * 0.9)
             )
+            .onTapGesture {
+                if let token = vm.selectedToken {
+                    let isInDragArea = vm.availableTokens.flatMap(\.self).contains(where: { $0.id == token.id })
+                    if !isInDragArea {
+                        vm.moveBackToDragArea(token)
+                        vm.selectedToken = nil
+                    }
+                }
+            }
     }
-}
-
-@available(iOS 17.0, *)
-#Preview(traits: .landscapeLeft) {
-    FirstLevelView()
 }

@@ -25,6 +25,7 @@ import SwiftUI
             size: CGSize(width: screenSize.width * 0.4, height: screenSize.height * 0.1),
             validQuestions: [
                 ["Why", "Does", "The Earth", "Rotate?"],
+                ["Why", "The Earth", "Rotate?"],
                 ["Is", "The Earth", "Travelling?"],
                 ["How", "Does", "The Earth", "Rotate?"],
                 ["What", "The Earth", "Is", "Made of?"],
@@ -42,6 +43,7 @@ import SwiftUI
                 ["How", "Are", "Comets", "Travelling?"],
                 ["Why", "Are", "Comets", "Travelling?"],
                 ["What", "Are", "Comets", "Made of?"],
+                ["What", "Comets","Are", "Made of?"],
                 ["How", "Comets", "Are", "Travelling?"],
                 ["Does", "Comets", "Rotate?"],
             ]

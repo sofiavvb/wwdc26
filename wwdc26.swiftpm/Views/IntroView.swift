@@ -14,38 +14,43 @@ struct IntroView: View {
         ZStack {
             Color.black.ignoresSafeArea()
             
-            GeometryReader { geometry in
-                VStack() {
+            VStack() {
+                Spacer()
+                Text(sceneManager.displayedText)
+                    .font(Font.custom(sceneManager.font, size: 72))
+                    .foregroundColor(.white)
+                    .frame(maxWidth: 900, maxHeight: 800, alignment: .leading)
+                
+                HStack {
                     Spacer()
-                    Text(sceneManager.displayedText)
-                        .font(Font.custom(sceneManager.font, size: 75))
-                        .foregroundColor(.white)
-                        .frame(maxWidth: .infinity, maxHeight: 800, alignment: .leading)
-                        .padding(.horizontal, 70)
-                        .offset(x: geometry.size.width / 8)
-
-                    
                     Button {
                         sceneManager.skip()
+                        SoundManager.shared.playSoundEffect(named: "buttonSound")
                     } label : {
-                        RoundedRectangle(cornerRadius: 20)
-                            .frame(width: 200, height: 50)
-                            .font(.title)
-                            .padding()
-                            .overlay {
-                                Text("Skip")
-                                    .font(Font.custom(sceneManager.font, size: 35))
-                                    .foregroundStyle(.white)
-                            }
+                        Image("skipbutton")
+                            .resizable()
+                            .scaledToFit()
+                            .frame(width: 80, height: 80)
+                            .scaleEffect(sceneManager.isTextComplete ? 1.13 : 1.0, anchor: .center)
+                            .shadow(
+                                color: sceneManager.isTextComplete ? .teal.opacity(0.5) : .clear,
+                                radius: sceneManager.isTextComplete ? 10 : 0
+                            )
+                            .animation(
+                                sceneManager.isTextComplete
+                                ? .smooth(duration: 0.8).repeatForever(autoreverses: true)
+                                : .default,
+                                value: sceneManager.isTextComplete
+                            )
                     }
+                    .padding()
+                    .offset(x: -20)
                 }
-            }
-           
-            
+            }.frame(maxWidth: .infinity)
         }.task{
             sceneManager.startDialog()
         }.onChange(of: sceneManager.dialogCompleted) {
-            sceneManager.navigate(to: .question)
+            sceneManager.navigate(to: .scientist)
         }.onTapGesture {
             sceneManager.skip()
         }
