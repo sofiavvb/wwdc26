@@ -57,6 +57,7 @@ import SwiftUI
                 ["Are", "The Rings", "Travelling?"],
                 ["Does", "The Rings", "Rotate?"],
                 ["What", "Are", "The Rings", "Made of?"],
+                ["Why", "Are", "The Rings", "Travelling?"],
                 ["How", "Does", "The Rings", "Rotate?"],
                 ["Why", "Does", "The Rings", "Rotate?"],
                 ["How", "Does", "The Rings", "Rotate?"],

@@ -24,7 +24,7 @@ struct InfoSheet: View {
             .overlay {
                 VStack (spacing: 0){
                     Text("""
-                         Multiple questions can move you further. There is not a single possible path...
+                         Multiple questions can move you further. There is not a single possible path... 
                          If needed, use the top trailing menu for help ;)
                          """)
                     .font(Font.custom(sceneManager.font, size: 32))
@@ -34,6 +34,7 @@ struct InfoSheet: View {
                     
                     Button {
                         vm.isShowingSheet.toggle()
+                        SoundManager.shared.playSoundEffect(named: "buttonSound")
                     } label: {
                         Image("dismissButton")
                             .resizable()
@@ -50,6 +51,10 @@ struct InfoSheet: View {
             }
             .frame(maxWidth: proxy.size.width * 0.6, maxHeight: proxy.size.height * 0.9)
            .transition(.scale)
+           .task {
+               try? await Task.sleep(nanoseconds: 0_000_500_000)
+               SoundManager.shared.playSoundEffect(named: "modal")
+           }
         
     }
 }

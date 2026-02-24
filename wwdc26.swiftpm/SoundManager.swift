@@ -18,23 +18,22 @@ import AVFoundation
     
     func playSoundEffect(named soundName: String) {
         guard let path = Bundle.main.path(forResource: "\(soundName)", ofType: "mp3") else {
-            print("Sound effect \(soundName) not found :( ")
             return
         }
         
         do {
             let url = URL(fileURLWithPath: path)
             soundEffectPlayer = try AVAudioPlayer(contentsOf: url)
-            soundEffectPlayer?.volume = 0.4
+            soundEffectPlayer?.volume = 0.45
             soundEffectPlayer?.play()
             
         } catch {
-            print("Error playing sound effect \(soundName): \(error.localizedDescription)")
+            print("Error playing \(soundName): \(error.localizedDescription)")
         }
     }
     
-    func playMusic(named musicName: String, loop: Bool = true) {
-        guard let url = Bundle.main.url(forResource: musicName, withExtension: "mp3") else {
+    func playMusic(named name: String, loop: Bool = true) {
+        guard let url = Bundle.main.url(forResource: name, withExtension: "mp3") else {
             return
         }
         

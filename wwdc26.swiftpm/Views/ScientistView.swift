@@ -29,6 +29,9 @@ struct ScientistView: View {
                             .frame(width: geometry.size.width * 1.2, height: geometry.size.height * 1.2)
                             .position(x: geometry.size.width * 0.55, y: geometry.size.height * 0.38)
                             .background(.black.opacity(0.55))
+                            .onAppear {
+                                SoundManager.shared.playSoundEffect(named: "component")
+                            }
                     } else {
                         Image(shipFrames[backgroundFrame])
                             .resizable()
@@ -80,6 +83,9 @@ struct ScientistView: View {
                 }
                 .onChange(of: sceneManager.dialogCompleted) {
                     sceneManager.navigate(to: .game)
+                }
+                .task{
+                    SoundManager.shared.playSoundEffect(named: "ship")
                 }
                 .ignoresSafeArea(.all)
             }

@@ -80,7 +80,7 @@ import SwiftUI
         if validateDropZone(dropZone) {
             completedZones.insert(dropZone.id)
             showCelebration = true
-            SoundManager.shared.playSoundEffect(named: "questionSucess")
+            SoundManager.shared.playSoundEffect(named: "sucess")
             GameManager.shared.currentFrame += 1
             
             if completedZones.count == dropZones.count {
