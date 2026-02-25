@@ -39,7 +39,6 @@ struct Token: Identifiable, Hashable, Codable {
     }
 }
 
-//TODO: deixar isso centralizado melhor, me parece meio gambiarrento oq eu fiz
 
 @MainActor var tokensFirstLevel_: [[Token]] = [
     [Token(text: "Does", background: "token-azul"),

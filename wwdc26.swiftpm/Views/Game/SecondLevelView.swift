@@ -108,11 +108,20 @@ struct SecondLevelGameArea: View {
                         ? Color.green.opacity(0.3)
                         : Color.gray.opacity(0.3)
                     )
+                    .stroke(
+                        vm.selectedToken != nil
+                        ? vm.selectedToken!.color
+                        : Color.clear,
+                        lineWidth: 2
+                    )
                     .frame(width: dropZone.size.width, height: dropZone.size.height)
                     .position(dropZone.position)
                     .onTapGesture { location in
+                        guard !vm.completedZones.contains(dropZone.id) else {
+                            return
+                        }
+                        
                         if let token = vm.selectedToken {
-//                            vm.moveToDropZone(token, dropZone: dropZone, at: CGPoint(x: dropZone.frame.minX, y: dropZone.baseline))
                             vm.moveToDropZone(token, dropZone: dropZone, at: location)
                             vm.selectedToken = nil
                         }

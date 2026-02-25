@@ -28,7 +28,7 @@ import AVFoundation
             soundEffectPlayer?.play()
             
         } catch {
-            print("Error playing \(soundName): \(error.localizedDescription)")
+            print("error playing \(soundName): \(error.localizedDescription)")
         }
     }
     

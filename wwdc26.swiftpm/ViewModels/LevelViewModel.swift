@@ -36,16 +36,6 @@ import SwiftUI
     }
     
     func moveToDropZone(_ token: Token, dropZone: DropZone, at position: CGPoint) {
-//        if !checkCompatibility(token, with: dropZone) {
-//            incorrectTokensIds.insert(token.id)
-//            SoundManager.shared.playSoundEffect(named: "error")
-//            
-//            Task {
-//                    try? await Task.sleep(nanoseconds: 600_000_000)
-//                    incorrectTokensIds.remove(token.id)
-//                    moveBackToDragArea(token)
-//            }
-//        }
         
         // if is in a dropzone already
         if let currentZoneIndex = dropZones.firstIndex(where: { $0.tokens.keys.contains(token.id) }) {
@@ -175,7 +165,7 @@ import SwiftUI
             return
         }
         
-        print("Pergunta escolhida: \(selectedQuestion)")
+        print("pergunta escolhida: \(selectedQuestion)")
         var tokenIdsToMove: [UUID] = []
         
         for word in selectedQuestion {

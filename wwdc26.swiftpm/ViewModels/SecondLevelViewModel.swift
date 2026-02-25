@@ -46,6 +46,7 @@ import SwiftUI
                 ["What", "Comets","Are", "Made of?"],
                 ["How", "Comets", "Are", "Travelling?"],
                 ["Does", "Comets", "Rotate?"],
+                ["Are", "Comets", "Travelling?"]
             ]
         )
         

@@ -12,7 +12,6 @@ struct FirstLevelView: View {
     @State private var vm = FirstLevelViewModel()
     @State private var navigateToNextLevel = false
     
-    
     var body: some View {
         NavigationStack {
             GeometryReader { proxy in
@@ -93,10 +92,25 @@ struct FirstLevelGameArea: View {
             // MARK: - Drop zones
             ForEach(vm.dropZones) { dropZone in
                 RoundedRectangle(cornerRadius: 15)
-                    .fill(Color.gray.opacity(0.3))
+                    .fill(
+                        vm.completedZones.contains(dropZone.id)
+                        ? Color.green.opacity(0.3)
+                        : Color.gray.opacity(0.3)
+                    )
+                    .stroke(
+                        vm.selectedToken != nil
+                        ? vm.selectedToken!.color
+                        : Color.clear,
+                        lineWidth: 2
+                    )
                     .frame(width: dropZone.size.width, height: dropZone.size.height)
                     .position(dropZone.position)
                     .onTapGesture { location in
+                        
+                        guard !vm.completedZones.contains(dropZone.id) else {
+                            return
+                        }
+
                         if let token = vm.selectedToken {
                             vm.moveToDropZone(token, dropZone: dropZone, at: location)
                             vm.selectedToken = nil

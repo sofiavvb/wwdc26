@@ -13,7 +13,7 @@ struct DropZone: Identifiable {
     let position: CGPoint
     let size: CGSize 
     let validQuestions: [[String]]
-    var tokens: [UUID: CGPoint] = [:]  //tokenId -> position in this zone
+    var tokens: [UUID: CGPoint] = [:]
     let minTokenSpacing: CGFloat = 65
     
     var frame: CGRect {

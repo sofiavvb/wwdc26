@@ -60,7 +60,7 @@ struct HologramMenu: View {
                                     .scaledToFit()
                                     .frame(width: 100, height: 50)
                                     .overlay{
-                                        buttonText(text: "RESET", font: sceneManager.font, acessibilityLabel: "Reset available tokens to drag area.")
+                                        buttonText(text: "CLEAR", font: sceneManager.font, acessibilityLabel: "Reset available tokens to drag area.")
                                     }
                             }
                         }
