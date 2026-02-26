@@ -40,7 +40,7 @@ enum SceneType {
             - Albert Einstein
             """,
             "Where can our curiosity take us?",
-            "Since humankind exists, we try to unveil the mysteries of reality, of the very universe that surround us.",
+            "As long as humankind has existed, we have tried to unveil the mysteries of reality, of the very universe that surrounds us.",
             "It is through science that we venture toward the boundaries of what we know. From the wonders of the universe to our own cells.",
             "At the core of science there is one thing: questions.",
             """

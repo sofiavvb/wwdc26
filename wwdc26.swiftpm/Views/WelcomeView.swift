@@ -9,17 +9,14 @@ import SwiftUI
 
 struct WelcomeView: View {
     @Environment(SceneManager.self) var sceneManager
-    var backgroundFrames = ["welcome1", "welcome2", "welcome3", "welcome4", "welcome5", "welcome6", "welcome7", "welcome8",
-                               "welcome9", "welcome10", "welcome11", "welcome12"]
+    var backgroundFrames = ["welcome1", "welcome2", "welcome3", "welcome4", "welcome5", "welcome6", "welcome7", "welcome8", "welcome9", "welcome10", "welcome11", "welcome12"]
     @State var backgroundFrame: Int = 0
     @State var easterEggFrame: Int = 0
     @State var isAnimating: Bool = false
-    var easterEggFrames = ["easterEgg1", "easterEgg2", "easterEgg3", "easterEgg4", "easterEgg5", "easterEgg6", "easterEgg7", "easterEgg8",
-                           "easterEgg9", "easterEgg10", "easterEgg11", "easterEgg12", "easterEgg13"]
+    var easterEggFrames = ["easterEgg1", "easterEgg2", "easterEgg3", "easterEgg4", "easterEgg5", "easterEgg6", "easterEgg7", "easterEgg8", "easterEgg9", "easterEgg10", "easterEgg11", "easterEgg12", "easterEgg13"]
 
     var body: some View {
         ZStack{
-
             TimelineView(.animation(minimumInterval: 0.15)) { timeline in
                 Image(backgroundFrames[backgroundFrame])
                     .resizable()
@@ -27,6 +24,7 @@ struct WelcomeView: View {
                     .onChange(of: timeline.date) { _, _ in
                         backgroundFrame = (backgroundFrame + 1) % backgroundFrames.count
                     }
+                    .accessibilityHidden(true)
             }
             
             Button {
@@ -40,9 +38,14 @@ struct WelcomeView: View {
                         Text("START")
                             .font(Font.custom(sceneManager.font, size: 30))
                             .foregroundStyle(Color(hex: "#0D201F"))
+                            .accessibilityHidden(true)
                     }
                     .frame(width: 200, height: 200)
             }
+            .accessibilityLabel(Text("Start"))
+            .accessibilityHint(Text("Begins the experience."))
+            .accessibilityAddTraits(.isButton)
+            
             VStack{
                 Spacer()
                 Spacer()
@@ -50,7 +53,6 @@ struct WelcomeView: View {
                 Spacer()
                 Spacer()
                 Spacer()
-
                 HStack{
                     Spacer()
                     Image(easterEggFrames[easterEggFrame])
@@ -58,6 +60,11 @@ struct WelcomeView: View {
                         .scaledToFit()
                         .frame(width: 350, height: 350)
                         .padding()
+                        .accessibilityElement()
+                        .accessibilityAddTraits(.isButton)
+                        .accessibilityLabel(Text(isAnimating ? "Smile emoji appearing" : "Question mark"))
+                        .accessibilityHint(Text(isAnimating ? "Wait for the animation to finish." : "Tap to play a fun animation."))
+                        .accessibilityIgnoresInvertColors(false)
                         .onTapGesture {
                             if isAnimating { return }
                             playEasterEgg()
@@ -89,3 +96,4 @@ struct WelcomeView: View {
     WelcomeView()
         .environment(sceneManager)
 }
+

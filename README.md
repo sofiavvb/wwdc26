@@ -17,7 +17,7 @@ The font used in all scenes is **Jersey 10**, available through Google Fonts:
 
 I can't thank enough my family, friends and all the mentors that supported me throughout this project :)
 
-## Websites Frequently Utilized:
+## Resources Frequently Utilized:
 - **[Apple Developer Documentation](https://developer.apple.com/documentation/):** Go-to resource for resolving coding issues.
 - **[Aseprite](https://www.aseprite.org/):** Primary platform for creating all pixel art assets.
 - **[Human Interface Guidelines](https://developer.apple.com/design/human-interface-guidelines/):** Essential resource for ensuring the app's UX and UI aligned with Apple’s design principles.

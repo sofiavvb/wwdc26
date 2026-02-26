@@ -11,8 +11,8 @@ import AVFoundation
 @MainActor
 @Observable class SoundManager {
     static let shared = SoundManager()
-    private var soundEffectPlayer: AVAudioPlayer?
     private var musicPlayer: AVAudioPlayer?
+    private var soundEffectPlayer: AVAudioPlayer?
     
     private init() {}
     
@@ -43,8 +43,8 @@ import AVFoundation
         
         do {
             musicPlayer = try AVAudioPlayer(contentsOf: url)
-            musicPlayer?.numberOfLoops = loop ? -1 : 0
             musicPlayer?.volume = 0.2
+            musicPlayer?.numberOfLoops = loop ? -1 : 0
             musicPlayer?.play()
         } catch {
             print("error playing music: \(error)")

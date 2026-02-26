@@ -31,7 +31,8 @@ import SwiftUI
                 ["What", "The Earth", "Is", "Made of?"],
                 ["What", "Is", "The Earth", "Made of?"],
                 ["How", "Is", "The Earth", "Travelling?"],
-                ["Why", "Is", "The Earth", "Travelling?"]
+                ["Why", "Is", "The Earth", "Travelling?"],
+                ["Does", "The Earth", "Rotate?"],
             ]
         )
         

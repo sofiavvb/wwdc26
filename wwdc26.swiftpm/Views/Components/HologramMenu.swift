@@ -20,6 +20,7 @@ struct HologramMenu: View {
                     Button {
                         withAnimation(.spring()) {
                             isExpanded.toggle()
+                            SoundManager.shared.playSoundEffect(named: "menu")
                         }
                     } label: {
                         if (isExpanded){
